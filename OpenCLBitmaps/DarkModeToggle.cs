@@ -115,7 +115,7 @@ namespace OpenCLBitmaps
 				}
 
 				// Set foreground color based on background brightness
-				if (control.ForeColor != Color.Red)
+				if (control.ForeColor != Color.Red && control.ForeColor != Color.DarkOrange)
 				{
 					control.ForeColor = darkMode ? Color.White : Color.Black;
 				}

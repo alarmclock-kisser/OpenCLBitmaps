@@ -541,7 +541,7 @@ namespace OpenCLBitmaps
 					if (pointers % 2 != 0)
 					{
 						inputControl.BackColor = Color.LightGray;
-						inputControl.ForeColor = Color.DarkOrange;
+						inputControl.ForeColor = Color.Red;
 						pointers++;
 					}
 
@@ -626,7 +626,7 @@ namespace OpenCLBitmaps
 				if (lowerName.Contains("width") || lowerName.Contains("height") || lowerName.Contains("channels") || lowerName.Contains("bitdepth"))
 				{
 					inputControl.BackColor = Color.LightGray;
-					inputControl.ForeColor = Color.Red;
+					inputControl.ForeColor = Color.DarkOrange;
 				}
 
 				// Add label and input control to panel
