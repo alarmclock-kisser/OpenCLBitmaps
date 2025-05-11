@@ -43,6 +43,7 @@
 			this.button_info = new Button();
 			this.button_recenter = new Button();
 			this.groupBox_kernel = new GroupBox();
+			this.button_kernelRandom = new Button();
 			this.button_kernelUnload = new Button();
 			this.button_kernelCreate = new Button();
 			this.checkBox_kernelOop = new CheckBox();
@@ -99,7 +100,7 @@
 			// 
 			// button_move
 			// 
-			this.button_move.Location = new Point(1255, 595);
+			this.button_move.Location = new Point(1421, 581);
 			this.button_move.Name = "button_move";
 			this.button_move.Size = new Size(75, 23);
 			this.button_move.TabIndex = 3;
@@ -109,7 +110,7 @@
 			// 
 			// button_reset
 			// 
-			this.button_reset.Location = new Point(1255, 719);
+			this.button_reset.Location = new Point(1255, 728);
 			this.button_reset.Name = "button_reset";
 			this.button_reset.Size = new Size(75, 23);
 			this.button_reset.TabIndex = 4;
@@ -203,6 +204,7 @@
 			// 
 			// groupBox_kernel
 			// 
+			this.groupBox_kernel.Controls.Add(this.button_kernelRandom);
 			this.groupBox_kernel.Controls.Add(this.button_kernelUnload);
 			this.groupBox_kernel.Controls.Add(this.button_kernelCreate);
 			this.groupBox_kernel.Controls.Add(this.checkBox_kernelOop);
@@ -218,6 +220,16 @@
 			this.groupBox_kernel.TabIndex = 13;
 			this.groupBox_kernel.TabStop = false;
 			this.groupBox_kernel.Text = "OpenCL Kernels";
+			// 
+			// button_kernelRandom
+			// 
+			this.button_kernelRandom.Location = new Point(133, 157);
+			this.button_kernelRandom.Name = "button_kernelRandom";
+			this.button_kernelRandom.Size = new Size(70, 23);
+			this.button_kernelRandom.TabIndex = 24;
+			this.button_kernelRandom.Text = "Random";
+			this.button_kernelRandom.UseVisualStyleBackColor = true;
+			this.button_kernelRandom.Click += this.button_kernelRandom_Click;
 			// 
 			// button_kernelUnload
 			// 
@@ -337,7 +349,7 @@
 			// 
 			// button_darkMode
 			// 
-			this.button_darkMode.Location = new Point(1420, 568);
+			this.button_darkMode.Location = new Point(12, 566);
 			this.button_darkMode.Name = "button_darkMode";
 			this.button_darkMode.Size = new Size(85, 23);
 			this.button_darkMode.TabIndex = 17;
@@ -365,7 +377,7 @@
 			// 
 			// button_createEmpty
 			// 
-			this.button_createEmpty.Location = new Point(1255, 627);
+			this.button_createEmpty.Location = new Point(1255, 595);
 			this.button_createEmpty.Name = "button_createEmpty";
 			this.button_createEmpty.Size = new Size(75, 23);
 			this.button_createEmpty.TabIndex = 20;
@@ -377,7 +389,7 @@
 			// 
 			this.button_createColor.BackColor = Color.Black;
 			this.button_createColor.ForeColor = Color.White;
-			this.button_createColor.Location = new Point(1255, 656);
+			this.button_createColor.Location = new Point(1255, 624);
 			this.button_createColor.Name = "button_createColor";
 			this.button_createColor.Size = new Size(75, 23);
 			this.button_createColor.TabIndex = 21;
@@ -387,7 +399,7 @@
 			// 
 			// numericUpDown_createSize
 			// 
-			this.numericUpDown_createSize.Location = new Point(1255, 685);
+			this.numericUpDown_createSize.Location = new Point(1255, 653);
 			this.numericUpDown_createSize.Maximum = new decimal(new int[] { 16384, 0, 0, 0 });
 			this.numericUpDown_createSize.Minimum = new decimal(new int[] { 16, 0, 0, 0 });
 			this.numericUpDown_createSize.Name = "numericUpDown_createSize";
@@ -398,7 +410,7 @@
 			// checkBox_mandelbrotMode
 			// 
 			this.checkBox_mandelbrotMode.AutoSize = true;
-			this.checkBox_mandelbrotMode.Location = new Point(12, 568);
+			this.checkBox_mandelbrotMode.Location = new Point(534, 568);
 			this.checkBox_mandelbrotMode.Name = "checkBox_mandelbrotMode";
 			this.checkBox_mandelbrotMode.Size = new Size(122, 19);
 			this.checkBox_mandelbrotMode.TabIndex = 23;
@@ -485,5 +497,6 @@
 		private NumericUpDown numericUpDown_createSize;
 		private CheckBox checkBox_mandelbrotMode;
 		private Button button_kernelUnload;
+		private Button button_kernelRandom;
 	}
 }

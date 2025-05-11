@@ -58,11 +58,13 @@ namespace OpenCLBitmaps
 			this.textBox_kernelBaseName.TextChanged += (s, e) => this.FillKernelVersions();
 			this.checkBox_kernelInvariantSearch.CheckedChanged += (s, e) => this.FillKernelVersions();
 			this.RegisterNumericToSecondPow(this.numericUpDown_createSize);
+			// this.comboBox_kernelBaseNames.TextChanged += (s, e) => this.LoadKernel();
 
 			// Apply appsettings
 			this.ApplyAppsettings();
 
 			// Start UI
+			this.AddTooltips();
 			this.UpdateView();
 
 		}
@@ -72,7 +74,7 @@ namespace OpenCLBitmaps
 
 
 		// ----- ----- ----- METHODS ----- ----- ----- \\
-		public void ApplyAppsettings()
+		private void ApplyAppsettings()
 		{
 			// Check file
 			if (!File.Exists(this.AppsettingsPath))
@@ -142,8 +144,50 @@ namespace OpenCLBitmaps
 				string latestName = Path.GetFileNameWithoutExtension(latestFile);
 				this.LoadKernel(latestName);
 			}
+		}
 
+		private void AddTooltips()
+		{
+			// Re-center button
+			ToolTip tt_Recenter = new ToolTip();
+			tt_Recenter.SetToolTip(this.button_recenter, "Hold CTRL to fit zoom.");
 
+			// Dark mode button
+			ToolTip tt_DarkMode = new ToolTip();
+			tt_DarkMode.SetToolTip(this.button_darkMode, "Toggle dark mode.");
+
+			// Create empty button
+			ToolTip tt_CreateEmpty = new ToolTip();
+			tt_CreateEmpty.SetToolTip(this.button_createEmpty, "Create empty square image\n" +
+				"with selected color in size.");
+
+			// Reset button
+			ToolTip tt_Reset = new ToolTip();
+			tt_Reset.SetToolTip(this.button_reset, "Reload original image from file path.");
+
+			// Move button
+			ToolTip tt_Move = new ToolTip();
+			tt_Move.SetToolTip(this.button_move, "Move image data to device or back.");
+
+			// Zoom numeric
+			ToolTip tt_Zoom = new ToolTip();
+			tt_Zoom.SetToolTip(this.numericUpDown_zoom, "Adjust zoom percentage.");
+
+			// OOP checkbox
+			ToolTip tt_OOP = new ToolTip();
+			tt_OOP.SetToolTip(this.checkBox_kernelOop, "Use OOP kernel execution.\n\n" +
+				"Note: This is only available for kernels with 2 pointer arguments.\n" +
+				"Otherwise, the kernel will be executed in IP mode automatically.");
+
+			// Info button
+			ToolTip tt_Info = new ToolTip();
+			tt_Info.SetToolTip(this.button_info, "Show OpenCL device info.\n" +
+				"Hold CTRL to show platform info.");
+
+			// Arguments panel
+			ToolTip tt_Arguments = new ToolTip();
+			tt_Arguments.SetToolTip(this.panel_kernelArguments, "Red is pointer.\n" +
+				"Orange is invariable argument.");
 		}
 
 		public void UpdateView()
@@ -457,7 +501,48 @@ namespace OpenCLBitmaps
 			this.UpdateView();
 		}
 
+		public void ExecuteKernelRandom(bool preLoad = false)
+		{
+			if (!preLoad)
+			{
+				// Get all kernel names
+				List<string> kernelFiles = this.KernelH?.Files.Keys.ToList() ?? [];
+				int randomIndex = new Random().Next(kernelFiles.Count);
 
+				// Get random kernel name
+				string file = kernelFiles[randomIndex];
+
+				// Load kernel
+				this.KernelH?.LoadKernel("", file, this.panel_kernelArguments);
+			}
+			
+		}
+
+		public List<object> GetRandomValues(List<Type> types)
+		{
+			List<object> values = new List<object>();
+			foreach (Type type in types)
+			{
+				if (type == typeof(int))
+				{
+					values.Add(new Random().Next(0, 100));
+				}
+				else if (type == typeof(float))
+				{
+					values.Add((float) new Random().NextDouble() * 100);
+				}
+				else if (type == typeof(double))
+				{
+					values.Add(new Random().NextDouble() * 100);
+				}
+				else if (type == typeof(bool))
+				{
+					values.Add(new Random().Next(0, 2) == 0);
+				}
+			}
+
+			return values;
+		}
 
 		// ----- ----- ----- PRIVATE METHODS ----- ----- ----- \\
 
@@ -725,11 +810,11 @@ namespace OpenCLBitmaps
 			// If CTRL down
 			if (ModifierKeys == Keys.Control)
 			{
-				this.ClH.GetInfoDeviceInfo(null, false, true);
+				this.ClH.GetInfoPlatformInfo(null, false, true);
 			}
 			else
 			{
-				this.ClH.GetInfoPlatformInfo(null, false, true);
+				this.ClH.GetInfoDeviceInfo(null, false, true);
 			}
 
 		}
@@ -782,6 +867,11 @@ namespace OpenCLBitmaps
 
 		private void button_recenter_Click(object sender, EventArgs e)
 		{
+			// If CTRL down fit zoom
+			if (ModifierKeys == Keys.Control)
+			{
+				this.ImgH.FitZoom();
+			}
 			this.ImgH.CenterImage();
 		}
 
@@ -875,6 +965,11 @@ namespace OpenCLBitmaps
 		private void checkBox_mandelbrotMode_CheckedChanged(object? sender, EventArgs e)
 		{
 			this.ToggleMandelbrotMode();
+		}
+
+		private void button_kernelRandom_Click(object sender, EventArgs e)
+		{
+			this.ExecuteKernelRandom();
 		}
 	}
 }

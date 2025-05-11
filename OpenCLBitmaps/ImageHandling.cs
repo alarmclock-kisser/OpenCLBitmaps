@@ -49,7 +49,7 @@ namespace OpenCLBitmaps
             this.ImagesList.Click += (s, e) => this.RemoveImage();
             this.ImagesList.SelectedIndexChanged += (s, e) =>
             {
-				this.ViewPBox.Image = this.CurrentImage;
+                this.ViewPBox.Image = this.CurrentImage;
                 this.MetaLabel.Text = this.CurrentObject?.GetMetaString() ?? "No image selected";
             };
             this.PropertyChanged += (s, e) =>
@@ -131,8 +131,8 @@ namespace OpenCLBitmaps
             if (e.Button == MouseButtons.Left)
             {
                 this.isDragging = false;
-			}
-		}
+            }
+        }
 
         public void ApplyZoom()
         {
@@ -325,8 +325,8 @@ namespace OpenCLBitmaps
             ofd.Multiselect = false;
             ofd.RestoreDirectory = true;
 
-			// Show dialog and get result
-			DialogResult result = ofd.ShowDialog();
+            // Show dialog and get result
+            DialogResult result = ofd.ShowDialog();
             if (result == DialogResult.OK)
             {
                 // Get selected file path
@@ -419,30 +419,59 @@ namespace OpenCLBitmaps
             {
                 index = this.ImagesList.SelectedIndex;
             }
-            
+
             // Check index range
             if (index < 0 || index >= this.Images.Count)
             {
                 return null;
             }
 
-			// Clone image object
+            // Clone image object
             ImageObject clone = new ImageObject(this.Images[index]);
 
-			// Add to list
-			this.Images.Add(clone);
+            // Add to list
+            this.Images.Add(clone);
 
-			// Fill listbox
-			this.FillImagesListBox();
+            // Fill listbox
+            this.FillImagesListBox();
 
-			// Select last entry in listbox
-			this.ImagesList.SelectedIndex = this.ImagesList.Items.Count - 1;
+            // Select last entry in listbox
+            this.ImagesList.SelectedIndex = this.ImagesList.Items.Count - 1;
 
-			// Return clone
-			return clone;
+            // Return clone
+            return clone;
+        }
+
+        public void FitZoom()
+        {
+            // Check if image is null
+            if (this.CurrentImage == null)
+            {
+                return;
+            }
+
+			// Get parent of ViewPBox (panel)
+			Panel? parent = this.ViewPBox.Parent as Panel;
+			if (parent == null)
+			{
+				return;
+			}
+
+			// Get dimensions
+			int containerWidth = parent.Width;
+			int containerHeight = parent.Height;
+			
+            // Calculate zoom factor
+			float widthFactor = (float) containerWidth / this.CurrentImage.Width;
+			float heightFactor = (float) containerHeight / this.CurrentImage.Height;
+			this.zoomFactor = Math.Min(widthFactor, heightFactor);
+
+            // Set zoom numeric value
+			this.ZoomNumeric.Value = (decimal) (this.zoomFactor * 100.0f);
+			
+            // Apply zoom
+			this.ApplyZoom();
 		}
-
-
 
 	}
 
