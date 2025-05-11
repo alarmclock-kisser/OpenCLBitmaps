@@ -478,5 +478,6 @@ namespace OpenCLBitmaps
             }
         }
 
+
     }
 }

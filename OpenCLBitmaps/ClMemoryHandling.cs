@@ -405,13 +405,13 @@ namespace OpenCLBitmaps
 			listBox.Items.Clear();
 
 			// Add (1) Single Buffers
-			foreach (CLBuffer buf in SingleBuffers.Keys)
+			foreach (CLBuffer buf in this.SingleBuffers.Keys)
 			{
                 listBox.Items.Add("(1) " + buf.Handle.ToString("X16"));
 			}
 
 			// Add (n) Array Buffers
-			foreach (KeyValuePair<CLBuffer[], nint[]> kvp in ArrayBuffers)
+			foreach (KeyValuePair<CLBuffer[], nint[]> kvp in this.ArrayBuffers)
 			{
 				listBox.Items.Add("(" + kvp.Key.Length + ") " + kvp.Key.FirstOrDefault().Handle.ToString("X16"));
 			}

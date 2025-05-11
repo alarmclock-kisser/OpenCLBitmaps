@@ -94,6 +94,20 @@ namespace OpenCLBitmaps
 
 			if (palette.TryGetValue(colorKey, out Color backColor))
 			{
+				// button_darkMode Text to light / dark mode
+				if (control is Button button)
+				{
+					if (button.Name == "button_darkMode")
+					{
+						button.Text = darkMode ? "Light mode" : "Dark mode";
+					}
+
+					if (button.Name == "button_createColor")
+					{
+						return;
+					}
+				}
+
 				// Special handling for transparent controls
 				if (backColor != Color.Transparent)
 				{

@@ -13,14 +13,14 @@ namespace OpenCLBitmaps
     {
         // ----- ----- ATTRIBUTES ----- ----- \\
         public string Repopath;
-		public ListBox ImagesList;
+        public ListBox ImagesList;
         public PictureBox ViewPBox;
         public NumericUpDown ZoomNumeric;
-		public Label MetaLabel;
+        public Label MetaLabel;
 
 
 
-		public List<ImageObject> Images = [];
+        public List<ImageObject> Images = [];
 
 
 
@@ -39,38 +39,38 @@ namespace OpenCLBitmaps
         {
             // Set attributes
             this.Repopath = repopath;
-			this.ImagesList = imageslistbox;
+            this.ImagesList = imageslistbox;
             this.ViewPBox = viewpicturebox;
             this.ZoomNumeric = zoomNumeric;
-			this.MetaLabel = metalabel;
+            this.MetaLabel = metalabel;
 
-			// Register events
-			this.ViewPBox.DoubleClick += (s, e) => this.ImportImage();
+            // Register events
+            this.ViewPBox.DoubleClick += (s, e) => this.ImportImage();
             this.ImagesList.Click += (s, e) => this.RemoveImage();
-			this.ImagesList.SelectedIndexChanged += (s, e) =>
-			{
+            this.ImagesList.SelectedIndexChanged += (s, e) =>
+            {
 				this.ViewPBox.Image = this.CurrentImage;
-				this.MetaLabel.Text = this.CurrentObject?.GetMetaString() ?? "No image selected";
-			};
-			this.PropertyChanged += (s, e) =>
+                this.MetaLabel.Text = this.CurrentObject?.GetMetaString() ?? "No image selected";
+            };
+            this.PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(ImageHandling.CurrentImage))
                 {
                     this.ViewPBox.Image = this.CurrentImage;
 
-					// Optionally, adjust PictureBox size to fit the image
-					if (this.CurrentImage != null)
-					{
-						this.ViewPBox.SizeMode = PictureBoxSizeMode.AutoSize;
-						this.ViewPBox.Width = (int) (this.CurrentImage.Width * this.zoomFactor);
-						this.ViewPBox.Height = (int) (this.CurrentImage.Height * this.zoomFactor);
-						this.ViewPBox.SizeMode = PictureBoxSizeMode.Zoom;
-					}
-					else
+                    // Optionally, adjust PictureBox size to fit the image
+                    if (this.CurrentImage != null)
                     {
-						this.ViewPBox.Image = null;
+                        this.ViewPBox.SizeMode = PictureBoxSizeMode.AutoSize;
+                        this.ViewPBox.Width = (int) (this.CurrentImage.Width * this.zoomFactor);
+                        this.ViewPBox.Height = (int) (this.CurrentImage.Height * this.zoomFactor);
+                        this.ViewPBox.SizeMode = PictureBoxSizeMode.Zoom;
                     }
-				}
+                    else
+                    {
+                        this.ViewPBox.Image = null;
+                    }
+                }
             };
 
             // Register zoom and drag events
@@ -88,11 +88,11 @@ namespace OpenCLBitmaps
         // ----- ----- METHODS ----- ----- \\
         private void ZoomNumeric_ValueChanged(object? sender, EventArgs e)
         {
-            this.zoomFactor = (float)this.ZoomNumeric.Value / 100.0f;
+            this.zoomFactor = (float) this.ZoomNumeric.Value / 100.0f;
             this.ApplyZoom();
         }
 
-        private void ViewPBox_MouseWheel(object? sender, MouseEventArgs e)
+        public void ViewPBox_MouseWheel(object? sender, MouseEventArgs e)
         {
             if (e.Delta > 0)
             {
@@ -106,18 +106,18 @@ namespace OpenCLBitmaps
             this.ApplyZoom();
         }
 
-        private void ViewPBox_MouseDown(object? sender, MouseEventArgs e)
+        public void ViewPBox_MouseDown(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
                 this.ApplyZoom();
 
-				this.isDragging = true;
+                this.isDragging = true;
                 this.mouseDownLocation = e.Location;
             }
         }
 
-        private void ViewPBox_MouseMove(object? sender, MouseEventArgs e)
+        public void ViewPBox_MouseMove(object? sender, MouseEventArgs e)
         {
             if (this.isDragging)
             {
@@ -126,20 +126,20 @@ namespace OpenCLBitmaps
             }
         }
 
-        private void ViewPBox_MouseUp(object? sender, MouseEventArgs e)
+        public void ViewPBox_MouseUp(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
                 this.isDragging = false;
-            }
-        }
+			}
+		}
 
-        private void ApplyZoom()
+        public void ApplyZoom()
         {
             if (this.CurrentImage != null)
             {
-                this.ViewPBox.Width = (int)(this.CurrentImage.Width * this.zoomFactor);
-                this.ViewPBox.Height = (int)(this.CurrentImage.Height * this.zoomFactor);
+                this.ViewPBox.Width = (int) (this.CurrentImage.Width * this.zoomFactor);
+                this.ViewPBox.Height = (int) (this.CurrentImage.Height * this.zoomFactor);
                 this.ViewPBox.SizeMode = PictureBoxSizeMode.Zoom;
             }
         }
@@ -171,7 +171,7 @@ namespace OpenCLBitmaps
             float s = 1.0f; // Saturation (Standardwert: 1)
             float v = 1.0f; // Value (Standardwert: 1)
 
-            int h = (int)(hue / 60) % 6;
+            int h = (int) (hue / 60) % 6;
             float f = hue / 60 - h;
             float p = v * (1 - s);
             float q = v * (1 - f * s);
@@ -213,7 +213,7 @@ namespace OpenCLBitmaps
                     break;
             }
 
-            return Tuple.Create((int)(r * 255), (int)(g * 255), (int)(b * 255));
+            return Tuple.Create((int) (r * 255), (int) (g * 255), (int) (b * 255));
         }
 
         public static float GetHueFromRgb(int r = 128, int g = 128, int b = 128)
@@ -261,11 +261,11 @@ namespace OpenCLBitmaps
 
         public void FillImagesListBox()
         {
-			// Get selected index
+            // Get selected index
             int selected = this.ImagesList.SelectedIndex;
 
-			// Clear listbox & fill with every image name
-			this.ImagesList.Items.Clear();
+            // Clear listbox & fill with every image name
+            this.ImagesList.Items.Clear();
             foreach (ImageObject img in this.Images)
             {
                 string entry = img.Name;
@@ -284,14 +284,14 @@ namespace OpenCLBitmaps
 
             // Select none selected if possible
             if (selected >= 0 && selected < this.ImagesList.Items.Count)
-			{
-				this.ImagesList.SelectedIndex = selected;
-			}
-			else if (this.ImagesList.Items.Count > 0)
-			{
-				this.ImagesList.SelectedIndex = 0;
-			}
-		}
+            {
+                this.ImagesList.SelectedIndex = selected;
+            }
+            else if (this.ImagesList.Items.Count > 0)
+            {
+                this.ImagesList.SelectedIndex = 0;
+            }
+        }
 
         public void LoadResourcesImages(int maxFileSizeMb = 8)
         {
@@ -377,7 +377,73 @@ namespace OpenCLBitmaps
             this.FillImagesListBox();
         }
 
-    }
+        public void CreateEmpty(Color? backColor = null, int size = 512, string name = "")
+        {
+            // Verify color
+            backColor ??= Color.Transparent;
+
+            // Positive size
+            size = Math.Max(size, 1);
+
+            // Generate name
+            if (string.IsNullOrEmpty(name))
+            {
+                name = "Image_" + (this.Images.Count + 1).ToString("00");
+            }
+
+            // Create bitmap with size and color
+            Bitmap bitmap = new(size, size, PixelFormat.Format32bppArgb);
+            using (Graphics g = Graphics.FromImage(bitmap))
+            {
+                g.Clear(backColor.Value);
+            }
+
+            // Create new ImageObject
+            ImageObject imgObj = new(bitmap, name);
+
+            // Add to list
+            this.Images.Add(imgObj);
+
+            // Fill listbox
+            this.FillImagesListBox();
+
+            // Select last entry in listbox
+            this.ImagesList.SelectedIndex = this.ImagesList.Items.Count - 1;
+        }
+
+        public ImageObject? Clone(int index = -1)
+        {
+            // Get index if -1
+            if (index < 0)
+            {
+                index = this.ImagesList.SelectedIndex;
+            }
+            
+            // Check index range
+            if (index < 0 || index >= this.Images.Count)
+            {
+                return null;
+            }
+
+			// Clone image object
+            ImageObject clone = new ImageObject(this.Images[index]);
+
+			// Add to list
+			this.Images.Add(clone);
+
+			// Fill listbox
+			this.FillImagesListBox();
+
+			// Select last entry in listbox
+			this.ImagesList.SelectedIndex = this.ImagesList.Items.Count - 1;
+
+			// Return clone
+			return clone;
+		}
+
+
+
+	}
 
     public class ImageObject
     {
@@ -417,10 +483,33 @@ namespace OpenCLBitmaps
             this.BitsPerPixel = Image.GetPixelFormatSize(this.Img.PixelFormat);
         }
 
+        public ImageObject(Bitmap bitmap, string name = "Empty")
+		{
+			// Set attributes
+			this.Name = name;
+			this.Img = bitmap;
+			this.Width = bitmap.Width;
+			this.Height = bitmap.Height;
+			this.Format = bitmap.PixelFormat;
+			this.BitsPerPixel = Image.GetPixelFormatSize(bitmap.PixelFormat);
+		}
+
+        public ImageObject(ImageObject obj)
+        {
+            this.Name = obj.Name;
+			this.Filepath = obj.Filepath;
+			this.Img = obj.Img;
+			this.Width = obj.Width;
+			this.Height = obj.Height;
+			this.Format = obj.Format;
+			this.BitsPerPixel = obj.BitsPerPixel;
+            this.Pointer = obj.Pointer;
+		}
 
 
-        // ----- ----- METHODS ----- ----- \\
-        public string VerifyFilepath(string filepath)
+
+		// ----- ----- METHODS ----- ----- \\
+		public string VerifyFilepath(string filepath)
         {
             string verified = "";
             string[] formats = [".tif", ".tiff", ".bmp", ".png", ".jpg", ".jpeg"];
@@ -527,9 +616,11 @@ namespace OpenCLBitmaps
         public byte[] GetPixelsAsBytes(bool nullImage = false)
         {
             if (this.Img == null)
-                return [];
+			{
+				return [];
+			}
 
-            Bitmap bmp = new(this.Img);
+			Bitmap bmp = new(this.Img);
             Rectangle rect = new(0, 0, bmp.Width, bmp.Height);
             BitmapData bmpData = bmp.LockBits(rect, ImageLockMode.ReadOnly, bmp.PixelFormat);
 

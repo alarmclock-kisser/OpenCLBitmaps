@@ -503,6 +503,9 @@ namespace OpenCLBitmaps
 			// Loop through arguments
 			int pointers = 0;
 			int offset = 0;
+			List<Label> colorLabels = [];
+			List<NumericUpDown> colorInputs = [];
+			List<Button> colorButtons = [];
 			TextBox? inputBufferTextbox = null;
 			for (int i = 0; i < arguments.Count; i++)
 			{
@@ -517,6 +520,10 @@ namespace OpenCLBitmaps
 				label.Text = argName;
 				label.Location = new Point(10, offset);
 				label.AutoSize = true;
+				if (argName.ToLower().EndsWith("r") || argName.ToLower().EndsWith("g") || argName.ToLower().EndsWith("b") || argName.ToLower().EndsWith("a"))
+				{
+					colorLabels.Add(label);
+				}
 
 				// Create input control based on type
 				Control inputControl;
@@ -527,7 +534,23 @@ namespace OpenCLBitmaps
 					((NumericUpDown) inputControl).Maximum = int.MaxValue;
 					((NumericUpDown) inputControl).DecimalPlaces = 0;
 					((NumericUpDown) inputControl).Increment = 1;
+					((NumericUpDown) inputControl).Value = 1;
 					// ((NumericUpDown) inputControl).ValueChanged += (s, e) => { this.Log("Value changed: " + ((NumericUpDown) s).Value); };
+
+					// Pointer length if pointers is uneven
+					if (pointers % 2 != 0)
+					{
+						inputControl.BackColor = Color.LightGray;
+						inputControl.ForeColor = Color.DarkOrange;
+						pointers++;
+					}
+
+					// Color input
+					else if (argName.ToLower().EndsWith("r") || argName.ToLower().EndsWith("g") || argName.ToLower().EndsWith("b") || argName.ToLower().EndsWith("a"))
+					{
+						inputControl.BackColor = Color.LightGray;
+						colorInputs.Add((NumericUpDown) inputControl);
+					}
 				}
 				else if (argType == typeof(float))
 				{
@@ -561,14 +584,6 @@ namespace OpenCLBitmaps
 					((NumericUpDown) inputControl).DecimalPlaces = 0;
 					((NumericUpDown) inputControl).Increment = 1;
 					// ((NumericUpDown) inputControl).ValueChanged += (s, e) => { this.Log("Value changed: " + ((NumericUpDown) s).Value); };
-
-					// Pointer length if pointers is uneven
-					if (pointers % 2 != 0)
-					{
-						inputControl.BackColor = Color.LightGray;
-						inputControl.ForeColor = Color.DarkOrange;
-						pointers++;
-					}
 				}
 				else if (argType == typeof(long*) || argType == typeof(float*) || argType == typeof(int*) || argType == typeof(uint*) || argType == typeof(ulong*) || argType == typeof(byte*))
 				{
@@ -590,6 +605,9 @@ namespace OpenCLBitmaps
 				inputControl.Width = refPanel.Width - label.Width - 35;
 				inputControl.Name = "argInput_" + argName;
 
+				// DEBUG LOG name
+				this.Log("Input control name: " + inputControl.Name, typeName, 2);
+
 				// Add tooltip to input control
 				ToolTip toolTip = new();
 				toolTip.SetToolTip(inputControl, "'" + typeName + "'");
@@ -603,15 +621,77 @@ namespace OpenCLBitmaps
 					toolTip.ForeColor = Color.Red;
 				}
 
-
-
-
 				// Add label and input control to panel
 				this.InputPanel.Controls.Add(label);
 				this.InputPanel.Controls.Add(inputControl);
 
 				offset += 30;
+
+				// Every 3: merge color inputs -> pick button
+				if (colorInputs.Count == 3 && colorLabels.Count == 3)
+				{
+					// Remove color inputs & labels from panel
+					for (int j = 0; j < colorLabels.Count; j++)
+					{
+						this.InputPanel.Controls.Remove(colorLabels[j]);
+						this.InputPanel.Controls.Remove(colorInputs[j]);
+						offset -= 30;
+					}
+
+					// Create label
+					Label colorLabel = new();
+					colorLabel.Name = "label_color_" + colorButtons.Count;
+					colorLabel.Text = string.Join(", ", colorLabels.Select(l => "'" + l.Text + "'"));
+					colorLabel.Location = new Point(10, offset);
+					colorLabel.AutoSize = true;
+
+					// Create button
+					Button colorButton = new();
+					colorButton.Name = "argInputColor_" + colorInputs.Count;
+					colorButton.Text = "Pick color";
+					colorButton.BackColor = Color.White;
+					colorButton.Size = new Size(120, 23);
+
+					// Location with padding
+					colorButton.Location = new Point(this.InputPanel.Width - colorButton.Width - 25, offset);
+
+					// Adjust label width
+					if (colorLabel.Right > colorButton.Left - 5)
+					{
+						colorLabel.Width = colorButton.Left - 5 - colorLabel.Left;
+						colorLabel.AutoEllipsis = true;
+					}
+
+					// Register event
+					colorButton.Click += (s, e) =>
+					{
+						// Show color dialog
+						ColorDialog colorDialog = new();
+						if (colorDialog.ShowDialog() == DialogResult.OK)
+						{
+							// Set button color
+							colorButton.BackColor = colorDialog.Color;
+
+							// Adjust text color
+							if (colorButton.BackColor.GetBrightness() < 0.5f)
+							{
+								colorButton.ForeColor = Color.White;
+							}
+						}
+					};
+
+					// Add button & label to list & panel
+					colorButtons.Add(colorButton);
+					this.InputPanel.Controls.Add(colorButton);
+					this.InputPanel.Controls.Add(colorLabel);
+
+					// Clear lists
+					colorInputs.Clear();
+					colorLabels.Clear();
+				}
 			}
+
+			
 
 			// If offset is more than panel height, make panel scrollable
 			if (offset > this.InputPanel.Height)
@@ -646,17 +726,13 @@ namespace OpenCLBitmaps
 				.Where(c => c.Name.Contains("argInput", StringComparison.OrdinalIgnoreCase))
 				.ToList();
 
-			// Make dict from controls & types
-			Dictionary<Control, Type> controlsDict = argTypes
-				.Select((type, index) => new { type, index })
-				.ToDictionary(x => controls[x.index], x => x.type);
-
 			// Get controls values
-			object[] values = new object[controls.Count];
+			List<object> values = [];
 
+			int offset = 0;
 			for (int i = 0; i < controls.Count; i++)
 			{
-				Control control = controls[i];
+				Control control = controls[i - offset];
 				Type type = argTypes[i];
 
 				// Get value from control
@@ -664,17 +740,34 @@ namespace OpenCLBitmaps
 				{
 					if (type == typeof(int))
 					{
-						values[i] = (int) numericUpDown.Value;
+						values.Add((int) numericUpDown.Value);
 					}
 					if (type == typeof(float))
 					{
-						values[i] = (float) numericUpDown.Value;
+						values.Add((float) numericUpDown.Value);
 					}
 				}
 				else if (control is TextBox textBox)
 				{
-					values[i] = long.TryParse(textBox.Text, out long result) ? result : 0;
+					values.Add(long.TryParse(textBox.Text, out long result) ? result : 0);
 				}
+				else if (control is Button button)
+				{
+					// Get color from button
+					values.Add((int) button.BackColor.R);
+					values.Add((int) button.BackColor.G);
+					values.Add((int) button.BackColor.B);
+
+					offset += 2;
+				}
+				else if (control is ComboBox comboBox)
+				{
+					values.Add(comboBox.SelectedItem ?? 0);
+				}
+				else if (control is CheckBox checkBox)
+				{
+					values.Add(checkBox.Checked);
+				}	
 				else
 				{
 					this.Log("Unsupported control type: " + control.GetType().Name);
@@ -682,20 +775,7 @@ namespace OpenCLBitmaps
 				}
 			}
 
-			return values;
-
-		}
-
-		private static object GetDefaultValue(Type type)
-		{
-			if (type == typeof(int)) return 0;
-			if (type == typeof(long)) return 0L;
-			if (type == typeof(float)) return 0f;
-			if (type == typeof(double)) return 0.0;
-			if (type == typeof(decimal)) return 0m;
-			if (type == typeof(bool)) return false;
-			if (type == typeof(string)) return string.Empty;
-			return Activator.CreateInstance(type) ?? (type.IsValueType ? Activator.CreateInstance(type)! : null!);
+			return values.ToArray();
 		}
 
 		public string GetLatestKernelFile(string searchName = "")
@@ -865,7 +945,7 @@ namespace OpenCLBitmaps
 			Stopwatch sw = Stopwatch.StartNew();
 
 			// Get kernel path
-			string kernelPath = Files.FirstOrDefault(f => f.Key.Contains(baseName + version)).Key ?? "";
+			string kernelPath = this.Files.FirstOrDefault(f => f.Key.Contains(baseName + version)).Key ?? "";
 
 			// Load kernel if not loaded
 			if (this.Kernel == null || this.KernelFile != kernelPath)
@@ -986,7 +1066,7 @@ namespace OpenCLBitmaps
 			Stopwatch sw = Stopwatch.StartNew();
 
 			// Get kernel path
-			string kernelPath = Files.FirstOrDefault(f => f.Key.Contains(baseName + version)).Key ?? "";
+			string kernelPath = this.Files.FirstOrDefault(f => f.Key.Contains(baseName + version)).Key ?? "";
 
 			// Load kernel if not loaded
 			if (this.Kernel == null || this.KernelFile != kernelPath)

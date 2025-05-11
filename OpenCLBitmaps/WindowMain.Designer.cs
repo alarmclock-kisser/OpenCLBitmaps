@@ -43,6 +43,7 @@
 			this.button_info = new Button();
 			this.button_recenter = new Button();
 			this.groupBox_kernel = new GroupBox();
+			this.button_kernelUnload = new Button();
 			this.button_kernelCreate = new Button();
 			this.checkBox_kernelOop = new CheckBox();
 			this.button_kernelExecute = new Button();
@@ -55,10 +56,17 @@
 			this.panel_kernelArguments = new Panel();
 			this.textBox_kernelCode = new TextBox();
 			this.button_darkMode = new Button();
+			this.label_imagesCount = new Label();
+			this.label_pointersCount = new Label();
+			this.button_createEmpty = new Button();
+			this.button_createColor = new Button();
+			this.numericUpDown_createSize = new NumericUpDown();
+			this.checkBox_mandelbrotMode = new CheckBox();
 			this.panel_view.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize) this.pictureBox_view).BeginInit();
 			((System.ComponentModel.ISupportInitialize) this.numericUpDown_zoom).BeginInit();
 			this.groupBox_kernel.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize) this.numericUpDown_createSize).BeginInit();
 			this.SuspendLayout();
 			// 
 			// listBox_log
@@ -67,7 +75,7 @@
 			this.listBox_log.ItemHeight = 15;
 			this.listBox_log.Location = new Point(12, 595);
 			this.listBox_log.Name = "listBox_log";
-			this.listBox_log.Size = new Size(800, 214);
+			this.listBox_log.Size = new Size(1237, 214);
 			this.listBox_log.TabIndex = 0;
 			this.listBox_log.DoubleClick += this.listBox_log_DoubleClick;
 			// 
@@ -75,9 +83,9 @@
 			// 
 			this.listBox_images.FormattingEnabled = true;
 			this.listBox_images.ItemHeight = 15;
-			this.listBox_images.Location = new Point(899, 595);
+			this.listBox_images.Location = new Point(1336, 610);
 			this.listBox_images.Name = "listBox_images";
-			this.listBox_images.Size = new Size(160, 214);
+			this.listBox_images.Size = new Size(160, 199);
 			this.listBox_images.TabIndex = 1;
 			// 
 			// comboBox_devices
@@ -91,7 +99,7 @@
 			// 
 			// button_move
 			// 
-			this.button_move.Location = new Point(818, 595);
+			this.button_move.Location = new Point(1255, 595);
 			this.button_move.Name = "button_move";
 			this.button_move.Size = new Size(75, 23);
 			this.button_move.TabIndex = 3;
@@ -101,7 +109,7 @@
 			// 
 			// button_reset
 			// 
-			this.button_reset.Location = new Point(818, 675);
+			this.button_reset.Location = new Point(1255, 719);
 			this.button_reset.Name = "button_reset";
 			this.button_reset.Size = new Size(75, 23);
 			this.button_reset.TabIndex = 4;
@@ -111,7 +119,7 @@
 			// 
 			// button_export
 			// 
-			this.button_export.Location = new Point(818, 786);
+			this.button_export.Location = new Point(1255, 786);
 			this.button_export.Name = "button_export";
 			this.button_export.Size = new Size(75, 23);
 			this.button_export.TabIndex = 5;
@@ -121,7 +129,7 @@
 			// 
 			// button_import
 			// 
-			this.button_import.Location = new Point(818, 757);
+			this.button_import.Location = new Point(1255, 757);
 			this.button_import.Name = "button_import";
 			this.button_import.Size = new Size(75, 23);
 			this.button_import.TabIndex = 6;
@@ -133,9 +141,9 @@
 			// 
 			this.listBox_pointers.FormattingEnabled = true;
 			this.listBox_pointers.ItemHeight = 15;
-			this.listBox_pointers.Location = new Point(1065, 595);
+			this.listBox_pointers.Location = new Point(1502, 610);
 			this.listBox_pointers.Name = "listBox_pointers";
-			this.listBox_pointers.Size = new Size(160, 214);
+			this.listBox_pointers.Size = new Size(160, 199);
 			this.listBox_pointers.TabIndex = 7;
 			// 
 			// panel_view
@@ -195,6 +203,7 @@
 			// 
 			// groupBox_kernel
 			// 
+			this.groupBox_kernel.Controls.Add(this.button_kernelUnload);
 			this.groupBox_kernel.Controls.Add(this.button_kernelCreate);
 			this.groupBox_kernel.Controls.Add(this.checkBox_kernelOop);
 			this.groupBox_kernel.Controls.Add(this.button_kernelExecute);
@@ -209,6 +218,16 @@
 			this.groupBox_kernel.TabIndex = 13;
 			this.groupBox_kernel.TabStop = false;
 			this.groupBox_kernel.Text = "OpenCL Kernels";
+			// 
+			// button_kernelUnload
+			// 
+			this.button_kernelUnload.Location = new Point(6, 157);
+			this.button_kernelUnload.Name = "button_kernelUnload";
+			this.button_kernelUnload.Size = new Size(60, 23);
+			this.button_kernelUnload.TabIndex = 23;
+			this.button_kernelUnload.Text = "Unload";
+			this.button_kernelUnload.UseVisualStyleBackColor = true;
+			this.button_kernelUnload.Click += this.button_kernelUnload_Click;
 			// 
 			// button_kernelCreate
 			// 
@@ -318,19 +337,86 @@
 			// 
 			// button_darkMode
 			// 
-			this.button_darkMode.Location = new Point(1587, 786);
+			this.button_darkMode.Location = new Point(1420, 568);
 			this.button_darkMode.Name = "button_darkMode";
-			this.button_darkMode.Size = new Size(75, 23);
+			this.button_darkMode.Size = new Size(85, 23);
 			this.button_darkMode.TabIndex = 17;
 			this.button_darkMode.Text = "Dark mode";
 			this.button_darkMode.UseVisualStyleBackColor = true;
 			this.button_darkMode.Click += this.button_darkMode_Click;
+			// 
+			// label_imagesCount
+			// 
+			this.label_imagesCount.AutoSize = true;
+			this.label_imagesCount.Location = new Point(1336, 592);
+			this.label_imagesCount.Name = "label_imagesCount";
+			this.label_imagesCount.Size = new Size(62, 15);
+			this.label_imagesCount.TabIndex = 18;
+			this.label_imagesCount.Text = "Images (0)";
+			// 
+			// label_pointersCount
+			// 
+			this.label_pointersCount.AutoSize = true;
+			this.label_pointersCount.Location = new Point(1502, 592);
+			this.label_pointersCount.Name = "label_pointersCount";
+			this.label_pointersCount.Size = new Size(67, 15);
+			this.label_pointersCount.TabIndex = 19;
+			this.label_pointersCount.Text = "Pointers (0)";
+			// 
+			// button_createEmpty
+			// 
+			this.button_createEmpty.Location = new Point(1255, 627);
+			this.button_createEmpty.Name = "button_createEmpty";
+			this.button_createEmpty.Size = new Size(75, 23);
+			this.button_createEmpty.TabIndex = 20;
+			this.button_createEmpty.Text = "Create";
+			this.button_createEmpty.UseVisualStyleBackColor = true;
+			this.button_createEmpty.Click += this.button_createEmpty_Click;
+			// 
+			// button_createColor
+			// 
+			this.button_createColor.BackColor = Color.Black;
+			this.button_createColor.ForeColor = Color.White;
+			this.button_createColor.Location = new Point(1255, 656);
+			this.button_createColor.Name = "button_createColor";
+			this.button_createColor.Size = new Size(75, 23);
+			this.button_createColor.TabIndex = 21;
+			this.button_createColor.Text = "Color";
+			this.button_createColor.UseVisualStyleBackColor = false;
+			this.button_createColor.Click += this.button_createColor_Click;
+			// 
+			// numericUpDown_createSize
+			// 
+			this.numericUpDown_createSize.Location = new Point(1255, 685);
+			this.numericUpDown_createSize.Maximum = new decimal(new int[] { 16384, 0, 0, 0 });
+			this.numericUpDown_createSize.Minimum = new decimal(new int[] { 16, 0, 0, 0 });
+			this.numericUpDown_createSize.Name = "numericUpDown_createSize";
+			this.numericUpDown_createSize.Size = new Size(75, 23);
+			this.numericUpDown_createSize.TabIndex = 22;
+			this.numericUpDown_createSize.Value = new decimal(new int[] { 1024, 0, 0, 0 });
+			// 
+			// checkBox_mandelbrotMode
+			// 
+			this.checkBox_mandelbrotMode.AutoSize = true;
+			this.checkBox_mandelbrotMode.Location = new Point(12, 568);
+			this.checkBox_mandelbrotMode.Name = "checkBox_mandelbrotMode";
+			this.checkBox_mandelbrotMode.Size = new Size(122, 19);
+			this.checkBox_mandelbrotMode.TabIndex = 23;
+			this.checkBox_mandelbrotMode.Text = "Mandelbrot mode";
+			this.checkBox_mandelbrotMode.UseVisualStyleBackColor = true;
+			this.checkBox_mandelbrotMode.CheckedChanged += this.checkBox_mandelbrotMode_CheckedChanged;
 			// 
 			// WindowMain
 			// 
 			this.AutoScaleDimensions = new SizeF(7F, 15F);
 			this.AutoScaleMode = AutoScaleMode.Font;
 			this.ClientSize = new Size(1674, 821);
+			this.Controls.Add(this.checkBox_mandelbrotMode);
+			this.Controls.Add(this.numericUpDown_createSize);
+			this.Controls.Add(this.button_createColor);
+			this.Controls.Add(this.button_createEmpty);
+			this.Controls.Add(this.label_pointersCount);
+			this.Controls.Add(this.label_imagesCount);
 			this.Controls.Add(this.button_darkMode);
 			this.Controls.Add(this.textBox_kernelCode);
 			this.Controls.Add(this.panel_kernelArguments);
@@ -358,6 +444,7 @@
 			((System.ComponentModel.ISupportInitialize) this.numericUpDown_zoom).EndInit();
 			this.groupBox_kernel.ResumeLayout(false);
 			this.groupBox_kernel.PerformLayout();
+			((System.ComponentModel.ISupportInitialize) this.numericUpDown_createSize).EndInit();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 		}
@@ -391,5 +478,12 @@
 		private ComboBox comboBox_kernelVersions;
 		private Button button_darkMode;
 		private Button button_kernelCreate;
+		private Label label_imagesCount;
+		private Label label_pointersCount;
+		private Button button_createEmpty;
+		private Button button_createColor;
+		private NumericUpDown numericUpDown_createSize;
+		private CheckBox checkBox_mandelbrotMode;
+		private Button button_kernelUnload;
 	}
 }
