@@ -534,7 +534,7 @@ namespace OpenCLBitmaps
 					((NumericUpDown) inputControl).Maximum = int.MaxValue;
 					((NumericUpDown) inputControl).DecimalPlaces = 0;
 					((NumericUpDown) inputControl).Increment = 1;
-					((NumericUpDown) inputControl).Value = 1;
+					((NumericUpDown) inputControl).Value = 0;
 					// ((NumericUpDown) inputControl).ValueChanged += (s, e) => { this.Log("Value changed: " + ((NumericUpDown) s).Value); };
 
 					// Pointer length if pointers is uneven
@@ -621,6 +621,14 @@ namespace OpenCLBitmaps
 					toolTip.ForeColor = Color.Red;
 				}
 
+				// Make invariable args also red
+				string lowerName = argName.ToLower();
+				if (lowerName.Contains("width") || lowerName.Contains("height") || lowerName.Contains("channels") || lowerName.Contains("bitdepth"))
+				{
+					inputControl.BackColor = Color.LightGray;
+					inputControl.ForeColor = Color.Red;
+				}
+
 				// Add label and input control to panel
 				this.InputPanel.Controls.Add(label);
 				this.InputPanel.Controls.Add(inputControl);
@@ -690,8 +698,6 @@ namespace OpenCLBitmaps
 					colorLabels.Clear();
 				}
 			}
-
-			
 
 			// If offset is more than panel height, make panel scrollable
 			if (offset > this.InputPanel.Height)
@@ -937,7 +943,7 @@ namespace OpenCLBitmaps
 
 
 		// Generic kernel calls (execute)
-		public long ExecuteKernelIPGeneric(string version = "01", string baseName = "NULL", long pointer = 0, int width = 0, int height = 0, object[]? variableArguments = null, bool logSuccess = false)
+		public long ExecuteKernelIPGeneric(string version = "01", string baseName = "NULL", long pointer = 0, int width = 0, int height = 0, int channels = 4, int bitdepth = 8, object[]? variableArguments = null, bool logSuccess = false)
 		{
 			// Start stopwatch
 			List<long> times = [];
@@ -988,7 +994,7 @@ namespace OpenCLBitmaps
 				: [(UIntPtr) pixelsTotal];
 
 			// Merge arguments
-			List<object> arguments = this.MergeArguments(variableArguments, pointer, 0, width, height, false);
+			List<object> arguments = this.MergeArguments(variableArguments, pointer, 0, width, height, channels, bitdepth, false);
 
 			// Set kernel arguments
 			for (int i = 0; i < arguments.Count; i++)
@@ -1058,7 +1064,7 @@ namespace OpenCLBitmaps
 			return pointer;
 		}
 
-		public long ExecuteKernelOOPGeneric(string version = "01", string baseName = "NULL", long pointer = 0, int width = 0, int height = 0, object[]? variableArguments = null, bool logSuccess = false)
+		public long ExecuteKernelOOPGeneric(string version = "01", string baseName = "NULL", long pointer = 0, int width = 0, int height = 0, int channels = 4, int bitdepth = 8, object[]? variableArguments = null, bool logSuccess = false)
 		{
 			// Start stopwatch
 			List<long> times = [];
@@ -1118,7 +1124,7 @@ namespace OpenCLBitmaps
 			times.Add(sw.ElapsedMilliseconds - times.Sum());
 
 			// Merge arguments
-			List<object> arguments = this.MergeArguments(variableArguments, pointer, outputPointer, width, height, false);
+			List<object> arguments = this.MergeArguments(variableArguments, pointer, outputPointer, width, height, channels, bitdepth, false);
 
 			// Set kernel arguments
 			for (int i = 0; i < arguments.Count; i++)
@@ -1178,10 +1184,13 @@ namespace OpenCLBitmaps
 			times.Add(times.Sum());
 			sw.Stop();
 
+			// Free input buffer
+			long freed = this.MemH.FreeBuffer(pointer, true);
+
 			// Log success with timeNames
 			if (logSuccess)
 			{
-				this.Log("Kernel executed successfully! Times: " + string.Join(", ", times.Select((t, i) => timeNames[i] + t + "ms")), "'" + baseName + version + "'", 2);
+				this.Log("Kernel executed successfully! Times: " + string.Join(", ", times.Select((t, i) => timeNames[i] + t + "ms")) + "(freed input: " + freed + "MB)", "'" + baseName + version + "'", 1);
 			}
 
 			// Return pointer
@@ -1201,12 +1210,13 @@ namespace OpenCLBitmaps
 
 
 
-		public List<object> MergeArguments(object[] arguments, long inputPointer = 0, long outputPointer = 0, int width = 0, int height = 0, bool log = false)
+		public List<object> MergeArguments(object[] arguments, long inputPointer = 0, long outputPointer = 0, int width = 0, int height = 0, int channels = 4, int bitdepth = 8, bool log = false)
 		{
 			List<object> result = [];
 
 			// Get kernel arguments
 			Dictionary<string, Type> kernelArguments = this.Arguments;
+			int bpp = bitdepth * channels;
 
 			// Match arguments to kernel arguments
 			bool inputFound = false;
@@ -1269,6 +1279,36 @@ namespace OpenCLBitmaps
 						if (log)
 						{
 							this.Log("Kernel argument height found: " + height.ToString(), "Index: " + i, 3);
+						}
+					}
+					else if (argName.ToLower() == "channels")
+					{
+						result.Add(channels <= 0 ? arguments[i] : channels);
+
+						// Log channels found
+						if (log)
+						{
+							this.Log("Kernel argument channels found: " + channels.ToString(), "Index: " + i, 3);
+						}
+					}
+					else if (argName.ToLower() == "bitdepth")
+					{
+						result.Add(bitdepth <= 0 ? arguments[i] : bitdepth);
+
+						// Log channels found
+						if (log)
+						{
+							this.Log("Kernel argument bitdepth found: " + bitdepth.ToString(), "Index: " + i, 3);
+						}
+					}
+					else if (argName.ToLower() == "bpp")
+					{
+						result.Add(bpp <= 0 ? arguments[i] : bpp);
+
+						// Log channels found
+						if (log)
+						{
+							this.Log("Kernel argument bpp found: " + bpp.ToString(), "Index: " + i, 3);
 						}
 					}
 					else

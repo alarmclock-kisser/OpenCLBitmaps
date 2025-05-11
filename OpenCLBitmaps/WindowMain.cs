@@ -356,9 +356,11 @@ namespace OpenCLBitmaps
 			long pointer = current.Pointer;
 			int width = current.Width;
 			int height = current.Height;
+			int channels = 4;
+			int bitdepth = current.BitsPerPixel / channels;
 
 			// Call exec generic kernel
-			current.Pointer = this.KernelH.ExecuteKernelIPGeneric(version, baseName, pointer, width, height, arguments, true);
+			current.Pointer = this.KernelH.ExecuteKernelIPGeneric(version, baseName, pointer, width, height, channels, bitdepth, arguments, true);
 
 			// Optionally move back
 			if (moved)
@@ -439,9 +441,11 @@ namespace OpenCLBitmaps
 			long pointer = current.Pointer;
 			int width = current.Width;
 			int height = current.Height;
+			int channels = 4;
+			int bitdepth = current.BitsPerPixel / channels;
 
 			// Call exec generic kernel
-			current.Pointer = this.KernelH.ExecuteKernelOOPGeneric(version, baseName, pointer, width, height, arguments, true);
+			current.Pointer = this.KernelH.ExecuteKernelOOPGeneric(version, baseName, pointer, width, height, channels, bitdepth, arguments, true);
 
 			// Optionally move back
 			if (moved)

@@ -323,9 +323,10 @@ namespace OpenCLBitmaps
             ofd.InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyPictures);
             ofd.Filter = @"Image Files|*.tif;*.tiff;*.bmp;*.png;*.jpg;*.jpeg";
             ofd.Multiselect = false;
+            ofd.RestoreDirectory = true;
 
-            // Show dialog and get result
-            DialogResult result = ofd.ShowDialog();
+			// Show dialog and get result
+			DialogResult result = ofd.ShowDialog();
             if (result == DialogResult.OK)
             {
                 // Get selected file path
